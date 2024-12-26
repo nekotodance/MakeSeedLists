@@ -292,7 +292,13 @@ class ThumbnailViewer(QMainWindow):
     def copy_seed_list(self):
         seedlists = [item[1][2] for item in self.file_data.items()]
         filterlists = [item for item in seedlists if item not in ("", NO_SEED_NUM)]
-        unique_lists = list(set(filterlists))
+        #unique_lists = list(set(filterlists))
+        seen = set()
+        unique_lists = []
+        for item in filterlists:
+            if item not in seen:
+                unique_lists.append(item)
+                seen.add(item)
         result = ",".join(unique_lists)
         self.seedTextEdit.setText(result)
         pyperclip.copy(result)
