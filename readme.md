@@ -6,7 +6,7 @@ X/Y/Z plotのSeedリストとして利用できるテキストを生成します
 ![SdImageDiet-image001](docs/MakeSeedLists-image001.jpg)
 
 ## インストール方法（簡易）
-[簡易インストール版zipのダウンロード] https://github.com/nekotodance/SdImageDiet/releases/download/latest/MakeSeedLists.zip
+[簡易インストール版zipのダウンロード] https://github.com/nekotodance/MakeSeedLists/releases/download/latest/MakeSeedLists.zip
 
 - zipファイルを解凍
 - 解凍したフォルダ内の「MakeSeedLists-install.ps1」を右クリックして「PowerShellで実行」を選択
