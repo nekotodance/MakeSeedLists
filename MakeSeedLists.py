@@ -206,7 +206,7 @@ class ThumbnailViewer(QMainWindow):
         new_files = []
         for root, _, files in os.walk(dir_path):
             for file in files:
-                full_path = os.path.join(root, file)
+                full_path = os.path.join(root, file).replace("\\", "/")
                 if self.is_image_file(full_path) and self.add_file_data(full_path):
                     new_files.append(full_path)
         return new_files
