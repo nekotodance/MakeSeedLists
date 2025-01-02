@@ -3,48 +3,6 @@ import datetime
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 
-#デバッグ用のコードの有効無効切り替え 0:無効、1:有効
-_IS_DEBUG = 0
-
-#for debug
-def dbgprint(message):
-    if _IS_DEBUG:
-        # date time string
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-        # print message
-        print(f"[{timestamp}] {message}")
-
-#json形式の設定ファイルから指定されたキーの値を読み込む
-def read_value_from_config(config_file, key):
-    try:
-        with open(config_file, 'r', encoding='utf-8') as f:
-            config_data = json.load(f)
-        return config_data.get(key, None)
-
-    except FileNotFoundError:
-        print(f"エラー: 設定ファイルが見つかりません: {config_file}")
-        return None
-    except json.JSONDecodeError:
-        print(f"エラー: 設定ファイルが正しいjson形式ではありません: {config_file}")
-        return None
-
-#json形式の設定ファイルへ指定されたキーの値を書き込む
-def write_value_to_config(config_file, key, value):
-    try:
-        try:
-            with open(config_file, 'r', encoding='utf-8') as f:
-                config_data = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            config_data = {}
-        config_data[key] = value
-        with open(config_file, 'w', encoding='utf-8') as f:
-            json.dump(config_data, f, ensure_ascii=False, indent=4)
-        return True
-
-    except Exception as e:
-        print(f"エラー: 設定ファイルへの書き込み中に問題が発生しました: {e}")
-        return False
-
 #文字列内のダブルバックスラッシュ (\\) をシングルバックスラッシュ (\) に置換
 def replace_double_backslash(input_string):
     return input_string.replace("\\\\", "\\")

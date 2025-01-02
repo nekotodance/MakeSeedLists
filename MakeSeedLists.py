@@ -1,9 +1,14 @@
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QListWidget, QListWidgetItem, QHBoxLayout, QStatusBar, QAbstractItemView, QTextEdit
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QPixmap, QIcon, QFont, QColor, QPainter, QImageReader
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton,
+    QListWidget, QListWidgetItem, QHBoxLayout, QStatusBar, QAbstractItemView, QTextEdit,
+    QMenu, QAction
+)
+from PyQt5.QtCore import Qt, QSize, QUrl
+from PyQt5.QtGui import QPixmap, QIcon, QFont, QColor, QPainter, QImageReader, QDesktopServices
 from datetime import datetime
+import subfunc
 import pvsubfunc
 import pyperclip
 
@@ -11,6 +16,8 @@ import pyperclip
 WINDOW_TITLE = "Make Seed Lists"
 # 設定ファイル
 SETTINGS_FILE = "MakeSeedLists_settings.json"
+# ログファイル
+LOGS_FILE = "MakeSeedLists.log"
 # 設定ファイルのキー名
 GEOMETRY_X = "geometry-x"
 GEOMETRY_Y = "geometry-y"
@@ -21,7 +28,7 @@ THUMBNAIL_SIZE = 158
 TEXT_HEIGHT = 48
 NO_SEED_NUM = '---'
 
-class ThumbnailViewer(QMainWindow):
+class MakeSeedLists(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -60,11 +67,28 @@ class ThumbnailViewer(QMainWindow):
             self.delete_selected_items()
         super().keyPressEvent(event)
 
+    def contextMenuEvent(self, event):
+        menu = QMenu(self)
+
+        action1 = QAction("ログファイルを開く", self)
+        menu.addAction(action1)
+        action1.triggered.connect(self.open_log_file)
+        menu.exec(event.globalPos())
+
+    def open_log_file(self):
+        if os.path.exists(self.log_file_path):
+            QDesktopServices.openUrl(QUrl.fromLocalFile(self.log_file_path))
+        else:
+            self.statusBar.showMessage(f"ログファイルがありません: {self.log_file_path}")
+
     #----------------------------------------
     #- 処理関数
     #----------------------------------------
     # UIの初期化
     def initUI(self):
+        self.logger = subfunc.ThreadSafeLogger(LOGS_FILE)
+        self.log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), LOGS_FILE)
+
         self.setWindowTitle(WINDOW_TITLE)
         self.setGeometry(100, 100, 848, 640)
         if not os.path.exists(SETTINGS_FILE):
@@ -143,10 +167,10 @@ class ThumbnailViewer(QMainWindow):
 
     #設定ファイルのロード
     def load_settings(self):
-        geox = pvsubfunc.read_value_from_config(SETTINGS_FILE, GEOMETRY_X)
-        geoy = pvsubfunc.read_value_from_config(SETTINGS_FILE, GEOMETRY_Y)
-        geow = pvsubfunc.read_value_from_config(SETTINGS_FILE, GEOMETRY_W)
-        geoh = pvsubfunc.read_value_from_config(SETTINGS_FILE, GEOMETRY_H)
+        geox = subfunc.read_value_from_config(SETTINGS_FILE, GEOMETRY_X)
+        geoy = subfunc.read_value_from_config(SETTINGS_FILE, GEOMETRY_Y)
+        geow = subfunc.read_value_from_config(SETTINGS_FILE, GEOMETRY_W)
+        geoh = subfunc.read_value_from_config(SETTINGS_FILE, GEOMETRY_H)
         if any(val is None for val in [geox, geoy, geow, geoh]):
             self.setGeometry(100, 100, 848, 640)    #位置とサイズ
         else:
@@ -154,10 +178,10 @@ class ThumbnailViewer(QMainWindow):
 
     #設定ファイルのセーブ
     def save_settings(self):
-        pvsubfunc.write_value_to_config(SETTINGS_FILE, GEOMETRY_X, self.geometry().x())
-        pvsubfunc.write_value_to_config(SETTINGS_FILE, GEOMETRY_Y, self.geometry().y())
-        pvsubfunc.write_value_to_config(SETTINGS_FILE, GEOMETRY_W, self.geometry().width())
-        pvsubfunc.write_value_to_config(SETTINGS_FILE, GEOMETRY_H, self.geometry().height())
+        subfunc.write_value_to_config(SETTINGS_FILE, GEOMETRY_X, self.geometry().x())
+        subfunc.write_value_to_config(SETTINGS_FILE, GEOMETRY_Y, self.geometry().y())
+        subfunc.write_value_to_config(SETTINGS_FILE, GEOMETRY_W, self.geometry().width())
+        subfunc.write_value_to_config(SETTINGS_FILE, GEOMETRY_H, self.geometry().height())
 
     # ステータスバー更新
     def update_status_bar(self):
@@ -316,6 +340,9 @@ class ThumbnailViewer(QMainWindow):
             mes = f"SEED番号が不明な{item_count-filter_count}ファイル、重複する{filter_count-unique_count}ファイルを除く、{unique_count}ファイルのシード番号をコピーしました"
         self.statusBar.showMessage(mes)
 
+        self.logger.log("info", mes)
+        self.logger.log("info", result)
+
     # ファイル名でのソート処理
     def sort_by_name(self):
         sorted_files = sorted(self.file_data.items(), key=lambda x: os.path.basename(x[0]))
@@ -332,6 +359,6 @@ class ThumbnailViewer(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    viewer = ThumbnailViewer()
+    viewer = MakeSeedLists()
     viewer.show()
     sys.exit(app.exec_())
