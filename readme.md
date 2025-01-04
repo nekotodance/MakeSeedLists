@@ -3,7 +3,7 @@ StableDiffusionで作成したPNG,JPG,WEBP画像をドラッグ＆ドロップ�
 AdetailerやHighRes、UpScaleなしで生成しておいて、一部のSEEDだけ時間をかけて生成するような場合に、
 X/Y/Z plotのSeedリストとして利用できるテキストを生成します  
 
-![SdImageDiet-image001](docs/MakeSeedLists-image001.jpg)
+![MakeSeedLists-image001](docs/MakeSeedLists-image001.jpg)
 
 ## インストール方法（簡易）
 [簡易インストール版zipのダウンロード] https://github.com/nekotodance/MakeSeedLists/releases/download/latest/MakeSeedLists.zip
