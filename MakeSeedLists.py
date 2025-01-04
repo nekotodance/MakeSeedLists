@@ -67,6 +67,7 @@ class MakeSeedLists(QMainWindow):
             self.delete_selected_items()
         super().keyPressEvent(event)
 
+    # 右クリックメニュー登録処理
     def contextMenuEvent(self, event):
         menu = QMenu(self)
 
@@ -74,12 +75,6 @@ class MakeSeedLists(QMainWindow):
         menu.addAction(action1)
         action1.triggered.connect(self.open_log_file)
         menu.exec(event.globalPos())
-
-    def open_log_file(self):
-        if os.path.exists(self.log_file_path):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(self.log_file_path))
-        else:
-            self.statusBar.showMessage(f"ログファイルがありません: {self.log_file_path}")
 
     #----------------------------------------
     #- 処理関数
@@ -158,6 +153,7 @@ class MakeSeedLists(QMainWindow):
         self.allclear_button.clicked.connect(self.all_clear_items)
         self.copy_seed_button.clicked.connect(self.copy_seed_list)
 
+        self.setWindowIcon(QIcon("res/MakeSeedLists.ico"))
         self.setAcceptDrops(True)
         self.update_status_bar()
 
@@ -356,6 +352,13 @@ class MakeSeedLists(QMainWindow):
         self.file_data = dict(sorted_files)
         self.refresh_list()
         self.update_status_bar()
+
+    # 右クリックメニュー - ログファイルを開く
+    def open_log_file(self):
+        if os.path.exists(self.log_file_path):
+            QDesktopServices.openUrl(QUrl.fromLocalFile(self.log_file_path))
+        else:
+            self.statusBar.showMessage(f"ログファイルがありません: {self.log_file_path}")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

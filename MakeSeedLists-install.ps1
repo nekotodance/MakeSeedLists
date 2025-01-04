@@ -6,6 +6,7 @@ Write-Host "========================================"
 $folder = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $exeFile = Join-Path $folder "venv\Scripts\pythonw.exe"
 $arguments = "MakeSeedLists.py"
+$iconFile = Join-Path $folder "res\MakeSeedLists.ico"
 $workingDirectory = $folder
 $shortcutName = "MakeSeedLists.lnk"
 $shortcutPath = Join-Path $folder $shortcutName
@@ -41,6 +42,7 @@ $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $exeFile
 $shortcut.Arguments = $arguments
+$shortcut.IconLocation = $iconFile
 $shortcut.WorkingDirectory = $workingDirectory
 $shortcut.Save()
 
